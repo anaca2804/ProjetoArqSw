@@ -1,6 +1,9 @@
-import iniciarServidor from "./server/server"; 
+import { mainRouter } from "./main.router";
+import { Server } from "./server/server"; 
 
 
-iniciarServidor();
+const aplicacao = new Server()
 
-
+aplicacao.iniciarServico([
+    mainRouter
+])

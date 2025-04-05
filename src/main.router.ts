@@ -14,3 +14,5 @@ class MainRouter extends Router {
         })
     }
 }
+
+export const mainRouter = new MainRouter()
