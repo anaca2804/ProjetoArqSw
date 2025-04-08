@@ -6,4 +6,5 @@ const aplicacao = new Server()
 
 aplicacao.iniciarServico([
     mainRouter
+    
 ])
