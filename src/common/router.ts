@@ -10,6 +10,7 @@ export abstract class Router extends EventEmitter {
 
     envelopeAll(document: any[], options: any = {}): any {
         return document
+      
     }
 
     render(response: express.Response, next: express.NextFunction) {
