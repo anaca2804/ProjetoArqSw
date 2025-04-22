@@ -15,6 +15,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     super();
     this.basePath = `/${model.collection.name}`;
   }
+
   protected prepareOne(
     query: mongoose.Query<D | null, D>
   ): mongoose.Query<D | null, D> {
@@ -26,4 +27,121 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     resource._links.self = `${this.basePath}/${resource._id}`;
     return resource;
   }
+
+  envelopeAll(documents: any[], options: any = {}): any {
+    const { url } = options;
+    const resource: any = {
+      _links: {
+        self: url,
+      },
+      items: documents,
+      total_items: options.count,
+      page: options.page ? options.page : 1,
+    };
+    if (options.page && options.count && options.pageSize) {
+      const pathname = url.substring(0, url.indexOf("?"));
+      const query = parse(url.substring(url.indexOf("?")));
+      if (options.page > 1) {
+        const previousQuery = Object.assign({}, query, {
+          _page: options.page - 1,
+        });
+        resource._links.previous = `${pathname}?${stringify(previousQuery)}`;
+      }
+      const remaining = (options.count = -options.page * options.pageSize);
+      if (remaining > 0) {
+        const nextQuery = Object.assign({}, query, { _page: options.page + 1 });
+        resource.links.next = `${pathname}?${stringify(nextQuery)}`;
+      }
+    }
+    return resource;
+  }
+
+  validateID = (req, resp, next) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      next({ message: "Documents não encontrado" });
+    } else {
+      next();
+    }
+  };
+
+  findById = (req, res, next) => {
+    const { id } = req.params;
+
+    //Verifica se o tipo do ID está correto
+    if (typeof id !== "string" || !mongoose.isValidObjectId(id)) {
+      return next(new Error("ID invalido"));
+    } else {
+      this.prepareOne(this.model.findById(id))
+        .then(this.render(res, next))
+        .catch(next);
+    }
+  };
+
+  findAll = (req, res, next) => {
+    let page = parseInt(req.query._page || 1);
+    page = page > 0 ? page : 1;
+    let psize = parseInt(req.query._pageSize || this.pageSize);
+    const skip = (page - 1) * psize;
+    this.model
+      .countDocuments()
+      .exec()
+      .then((count) =>
+        this.model
+          .find()
+          .skip(skip)
+          .limit(psize)
+          .sort([["_id", -1]])
+      )
+      .then(
+        this.renderAll(res, next, {
+          page,
+          count,
+          pageSize: psize,
+          url: req.url,
+        })
+      )
+      .catch(next);
+  };
+  prepareWhere = (query) => {
+    const traverse = (o) => {
+      if (Array.isArray(o)) traverseArray(o);
+      if (typeof o === "object" && o !== null) traverseObject(o);
+      return o;
+    };
+    const traverseArray = (a) => {
+      a.forEach((i) => traverse(i));
+    };
+    const traverseObject = (o) => {
+      Object.keys(o)
+        .filter((k) => k !== "$options")
+        .forEach((k) => {
+          if (k === "$regex") {
+            o[k] = new RegExp(o[k], o["$options"]);
+            delete o["$options"];
+          } else if (k === "$and" || k === "$or" || k === "$nor") {
+            if (o[k].length === 0) delete o[k];
+          } else traverse(o[k]);
+        });
+    };
+    return traverse(query);
+  };
+  find = (req, resp, next) => {
+    const pageSize = parseInt(req.query._pageSize) || this.pageSize;
+    let page = parseInt(req.query._page || 1);
+    page = page > 0 ? page : 1;
+    const skip = (page - 1) * pageSize;
+
+    let query = this.model.find({});
+    let countQuery = this.model.find({}).countDocuments;
+
+    if (req.customFilter) {
+      try {
+        const q = this.prepareWhere(JSON.parse(req.customFilter));
+        query = query.where(q);
+        countQuery = countQuery.where(q);
+      } catch (err) {
+        next;
+      }
+    }
+  };
 }
