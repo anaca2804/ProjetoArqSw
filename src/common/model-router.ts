@@ -15,4 +15,15 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     super();
     this.basePath = `/${model.collection.name}`;
   }
+  protected prepareOne(
+    query: mongoose.Query<D | null, D>
+  ): mongoose.Query<D | null, D> {
+    return query;
+  }
+
+  envelope(document: any): any {
+    let resource = Object.assign({ _links: {} }, document.toJSON());
+    resource._links.self = `${this.basePath}/${resource._id}`;
+    return resource;
+  }
 }
