@@ -102,6 +102,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
       )
       .catch(next);
   };
+
   prepareWhere = (query) => {
     const traverse = (o) => {
       if (Array.isArray(o)) traverseArray(o);
@@ -125,6 +126,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     };
     return traverse(query);
   };
+
   find = (req, resp, next) => {
     const pageSize = parseInt(req.query._pageSize) || this.pageSize;
     let page = parseInt(req.query._page || 1);
@@ -132,7 +134,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     const skip = (page - 1) * pageSize;
 
     let query = this.model.find({});
-    let countQuery = this.model.find({}).countDocuments;
+    let countQuery = this.model.find({}).countDocuments();
 
     if (req.customFilter) {
       try {
@@ -143,5 +145,69 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         next;
       }
     }
+
+    const sort =
+      (req.query.sort && req.query.sort.replace(/}/g, "")) || this.defaultSort;
+    if (sort) {
+      query = query.sort(sort);
+    }
+
+    query.skip(skip).limit(pageSize);
+
+    countQuery.exec().then((result) => {
+      query
+        .then(
+          this.renderAll(resp, next, {
+            page,
+            pageSize,
+            count: result,
+            url: req.url,
+            query: req.query,
+          })
+        )
+        .catch(next);
+    });
   };
+
+  save = (req, resp, next) => {
+    let document = new this.model(req.body);
+    document.save().then(this.render(resp, next)).catch(next);
+  };
+
+  replace = (req, resp, next) => {
+    const options = {
+      runValidators: true,
+      overwrite: true,
+      useFindAndModify: false,
+    };
+    this.model
+      .findOneAndReplace({ _id: req.params.id }, req.body, options)
+      .then(this.render(resp, next))
+      .catch(next);
+  };
+
+  update = (req, resp, next) => {
+    const options = { runValidators: true, new: true, useFindAndModify: true, runHooks: true };
+    this.model
+      .findOneAndUpdate({ _id: req.params.id }, req.body, options)
+      .then(this.render(resp, next))
+      .catch(next);
+  };
+
+  delete = (req, resp, next) => {
+    this.model
+      .deleteOne({ _id: req.params.id })
+      .exec()
+      .then((cmdResult: any) => {
+        if (cmdResult.deletedCount > 0) {
+          resp.sendStatus(204);
+        } else {
+          resp.status(404).send("Documento não encontrado");
+        }
+        return next();
+      })
+      .catch(next);
+  };;
+
+
 }
