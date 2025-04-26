@@ -18,3 +18,11 @@ const LogSchema = new mongoose.Schema({
         enum: ['cadastro', 'exclusão', 'edicao']
     }
 })
+
+const Logs = mongoose.model<ILog>('Logs', LogSchema);
+
+export{
+    Logs,
+    LogSchema,
+    ILog
+}

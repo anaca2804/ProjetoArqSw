@@ -28,3 +28,4 @@ export{
     UsuarioSchema,
     IUsuario
 }
+
