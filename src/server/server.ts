@@ -9,8 +9,11 @@ const port = enviroment.server.port;
 export class Server {
     app: Express = express();
 
-    iniciarServidor = () => {
+    constructor() {
         this.app.use(express.json());
+    }
+
+    iniciarServidor = () => {
         this.app.listen(port, () => {
             console.log(`Servidor rodando em http://localhost:${port}`);
         });
@@ -19,16 +22,16 @@ export class Server {
     async conectarBaseDados() {
         try {
             await mongoose.connect(enviroment.db.url);
-            console.log("conectado o banco");
+            console.log("Conectado ao banco");
         } catch (error) {
             throw (`Erro: ${error}`);
         }
-    };
+    }
 
     iniciarRotas = (routers: Router[]) => {
         routers.forEach(router => router.applyrouter(this.app));
         this.app.use(handleError);
-    };
+    }
 
     iniciarServico = (routers: Router[]): Promise<Server> => {
         return this.conectarBaseDados()
@@ -37,5 +40,5 @@ export class Server {
                 this.iniciarServidor();
                 return this;
             });
-    };
+    }
 }
