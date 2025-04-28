@@ -25,30 +25,9 @@ ProjetoArqSw/
 │
 ├── src/
 │   ├── common/             # Utilitários comuns (ex: rotas base, variáveis de ambiente)
-│   │   ├── environment.ts  # Configuração de variáveis de ambiente
-│   │   ├── model-router.ts # Roteador genérico para modelos
-│   │   └── router.ts       # Configuração de rotas genéricas
-│   │
 │   ├── controllers/        # Controladores das entidades (lógica das requisições)
-│   │   ├── log.controller.ts
-│   │   ├── movimentacoes-estoque.controller.ts
-│   │   ├── permissao.controller.ts
-│   │   ├── permissoes.controller.ts
-│   │   ├── produto.controller.ts
-│   │   └── usuario.controller.ts
-│   │
 │   ├── models/             # Modelos de dados (estrutura das entidades)
-│   │   ├── log.model.ts
-│   │   ├── movimentacoes-estoque.model.ts
-│   │   ├── permissao.model.ts
-│   │   ├── permissoes.models.ts
-│   │   ├── produto.models.ts
-│   │   └── usuario.model.ts
-│   │
 │   ├── server/             # Configurações e inicialização do servidor
-│   │   ├── error.handler.ts # Tratamento de erros
-│   │   └── server.ts       # Arquivo de bootstrap do servidor
-│   │
 │   ├── main.router.ts      # Arquivo principal de roteamento
 │   └── main.ts             # Ponto de entrada da aplicação
 │
