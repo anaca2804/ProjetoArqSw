@@ -6,18 +6,15 @@ O projeto utiliza **Node.js**, **Express** e **TypeScript**, seguindo o padrão 
 
 ## Tecnologias Utilizadas
 
-- **Node.js**: Ambiente de execução JavaScript no servidor.
-- **Express**: Framework minimalista para construção de APIs REST.
 - **TypeScript**: Superset do JavaScript que adiciona tipagem estática.
-- **Mongoose**: ODM para comunicação com bancos MongoDB.
+- **@types/express**: Tipagens TypeScript para o framework Express.
+- **@types/node**: Tipagens TypeScript para os módulos nativos do Node.js.
 - **dotenv**: Gerenciamento de variáveis de ambiente.
-- **express-validator**: Middleware para validação de entradas de dados.
-- **bcryptjs**: Biblioteca para hash de senhas.
-- **jsonwebtoken**: Implementação de autenticação baseada em tokens JWT.
+- **Express**: Framework minimalista para construção de APIs REST.
+- **mongodb**: Driver oficial do MongoDB para Node.js.
+- **Mongoose**: ODM para comunicação com bancos MongoDB.
 - **nodemon**: Monitoramento automático para ambiente de desenvolvimento.
-- **cors**: Middleware para habilitar CORS nas requisições HTTP.
-- **helmet**: Middleware para reforçar a segurança HTTP.
-- **morgan**: Logger de requisições HTTP.
+- **projetoarqsw**: Dependência local vinculada ao projeto, utilizada para organização ou funcionalidades específicas.
 
 ## Estrutura de Pastas
 
@@ -27,20 +24,38 @@ O projeto segue a arquitetura **MVC** (Model-View-Controller):
 ProjetoArqSw/
 │
 ├── src/
-│   ├── config/            # Configurações da aplicação (ex: banco de dados)
-│   ├── controllers/       # Controladores (lógica que responde às requisições)
-│   ├── middlewares/       # Middlewares personalizados (ex: autenticação, validações)
-│   ├── models/            # Modelos de dados (MongoDB via Mongoose)
-│   ├── routes/            # Definições de rotas da aplicação
-│   ├── services/          # Regras de negócio e integrações
-│   ├── utils/             # Funções utilitárias (helpers)
-│   └── app.ts             # Arquivo principal que configura o Express
+│   ├── common/             # Utilitários comuns (ex: rotas base, variáveis de ambiente)
+│   │   ├── environment.ts  # Configuração de variáveis de ambiente
+│   │   ├── model-router.ts # Roteador genérico para modelos
+│   │   └── router.ts       # Configuração de rotas genéricas
+│   │
+│   ├── controllers/        # Controladores das entidades (lógica das requisições)
+│   │   ├── log.controller.ts
+│   │   ├── movimentacoes-estoque.controller.ts
+│   │   ├── permissao.controller.ts
+│   │   ├── permissoes.controller.ts
+│   │   ├── produto.controller.ts
+│   │   └── usuario.controller.ts
+│   │
+│   ├── models/             # Modelos de dados (estrutura das entidades)
+│   │   ├── log.model.ts
+│   │   ├── movimentacoes-estoque.model.ts
+│   │   ├── permissao.model.ts
+│   │   ├── permissoes.models.ts
+│   │   ├── produto.models.ts
+│   │   └── usuario.model.ts
+│   │
+│   ├── server/             # Configurações e inicialização do servidor
+│   │   ├── error.handler.ts # Tratamento de erros
+│   │   └── server.ts       # Arquivo de bootstrap do servidor
+│   │
+│   ├── main.router.ts      # Arquivo principal de roteamento
+│   └── main.ts             # Ponto de entrada da aplicação
 │
-├── .env                   # Variáveis de ambiente
-├── .gitignore             # Arquivos e pastas ignorados pelo Git
-├── package.json           # Dependências, scripts e metadados do projeto
-├── tsconfig.json          # Configurações do compilador TypeScript
-└── README.md
+├── .gitignore              # Arquivos e pastas ignorados pelo Git
+├── package.json            # Dependências, scripts e metadados do projeto
+├── README.md               # Documentação do projeto
+└── tsconfig.json           # Configurações do compilador TypeScript
 ```
 
 ## Instalação
@@ -67,7 +82,6 @@ npm install
 ```env
 PORT=3000
 MONGO_URI=mongodb://localhost:27017/projetoarqsw
-JWT_SECRET=sua_chave_secreta
 ```
 
 ## Como Rodar o Projeto
