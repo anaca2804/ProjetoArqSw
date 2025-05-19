@@ -8,28 +8,20 @@
     "build": "npx tsc --watch",
     "dev": "nodemon dist/main.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/anaca2804/ProjetoArqSw.git"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/anaca2804/ProjetoArqSw/issues"
-  },
-  "homepage": "https://github.com/anaca2804/ProjetoArqSw#readme",
   "devDependencies": {
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.13",
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mongodb": "^6.15.0",
     "mongoose": "^8.13.0",
-    "nodemon": "^3.1.9",
-    "projetoarqsw": "file:"
+    "nodemon": "^3.1.9"
   }
 }
