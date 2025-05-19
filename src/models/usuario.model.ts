@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import * as bcrypt from "bcrypt";
+import { enviroment } from "../common/environment";
 interface IUsuario extends mongoose.Document{
     nome: string;
     email: string;
@@ -21,11 +22,9 @@ const UsuarioSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-const Usuario = mongoose.model<IUsuario>('Usuario', UsuarioSchema);
-
 const encriptaSenha = (obj, next) => {
     bcrypt
-        .hash(obj.senha, 10)
+        .hash(obj.senha, Number(enviroment.security.rounds))
         .then((hash)=> {
             obj.senha = hash;
             next();
@@ -41,6 +40,11 @@ const saveMiddleware = function (this: IUsuario, next) {
         encriptaSenha(usuario,next);
     }
 }
+
+UsuarioSchema.pre("save", saveMiddleware);
+
+const Usuario = mongoose.model<IUsuario>('Usuario', UsuarioSchema);
+
 export{
     Usuario,
     UsuarioSchema,

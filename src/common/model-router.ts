@@ -57,6 +57,8 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
   }
 
   validateID = (req, resp, next) => {
+    console.log(req.params.id);
+    
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       next({ message: "Documents não encontrado" });
     } else {
@@ -195,6 +197,8 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
   };
 
   delete = (req, resp, next) => {
+    console.log(req.params.id);
+    
     this.model
       .deleteOne({ _id: req.params.id })
       .exec()
