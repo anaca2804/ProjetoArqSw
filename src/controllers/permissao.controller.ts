@@ -14,7 +14,7 @@ class PermissaoController extends ModelRouter<IPermissao> {
         app.post(`${this.basePath}`, this.save);
         app.patch(`${this.basePath}/:id`, [this.validateID,this.update]);
         app.put(`${this.basePath}/:id`, [this.validateID,this.replace]);
-        app.delete(`${this.basePath}`, [this.validateID,this.delete]);
+        app.delete(`${this.basePath}/:id`, [this.validateID,this.delete]);
     }
 };
 const PermissaoCadController = new PermissaoController();

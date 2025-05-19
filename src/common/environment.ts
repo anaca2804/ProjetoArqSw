@@ -6,5 +6,8 @@ export const enviroment = {
     },
     db:{
         url: process.env.DB_URI_CONNECT || "localhost"
+    },
+    security:{
+        rounds: process.env.SECURITY_PASSWORD_ROUNDS || 10
     }
 }
