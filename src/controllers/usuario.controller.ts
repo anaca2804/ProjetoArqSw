@@ -2,10 +2,35 @@
 import { ModelRouter } from "../common/model-router";
 import * as express from 'express' 
 import { IUsuario, Usuario } from "../models/usuario.model";
+import jwt from 'jsonwebtoken';
 
 class UsuarioController extends ModelRouter<IUsuario> {
     constructor() {
         super(Usuario)
+    }
+
+    login = async (req: express.Request, res: express.Response) => {
+        const { email, senha } = req.body;
+
+        const generateToken = (id: string): string => {
+            return jwt.sign({ id }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
+        };
+
+        try {
+            const usuario = await Usuario.findOne({ email });
+            if (!usuario || !(await usuario.matchSenha(senha))) {
+                return res.status(401).json({ message: 'Credenciais inválidas' });
+            }
+
+            const token = generateToken(String(usuario._id)); // Garantir que _id é tratado como string
+            res.json({ token });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                res.status(500).json({ message: error.message });
+            } else {
+                res.status(500).json({ message: 'Erro desconhecido' });
+            }
+        }
     }
 
     applyrouter(app: express.Application) {
