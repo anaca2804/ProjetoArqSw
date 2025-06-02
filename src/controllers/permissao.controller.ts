@@ -1,7 +1,7 @@
 import { ModelRouter } from "../common/model-router";
 import * as express from 'express';
 import { IPermissao, Permissao } from "../models/permissao.model";
-import { Usuario } from "../models/usuario.model";
+import { autenticacao } from "../middleware/authmiddleware";
 
 class PermissaoController extends ModelRouter<IPermissao> {
     constructor () {
@@ -9,12 +9,12 @@ class PermissaoController extends ModelRouter<IPermissao> {
     }
 
     applyrouter(app: express.Application) {
-        app.get(`${this.basePath}`, this.find);
-        app.get(`${this.basePath}/:id`, [this.validateID,this.findById]);
-        app.post(`${this.basePath}`, this.save);
-        app.patch(`${this.basePath}/:id`, [this.validateID,this.update]);
-        app.put(`${this.basePath}/:id`, [this.validateID,this.replace]);
-        app.delete(`${this.basePath}/:id`, [this.validateID,this.delete]);
+        app.get(`${this.basePath}`, [autenticacao, this.find]);
+        app.get(`${this.basePath}/:id`, [autenticacao, this.validateID,this.findById]);
+        app.post(`${this.basePath}`, [autenticacao, this.save]);
+        app.patch(`${this.basePath}/:id`, [autenticacao, this.validateID,this.update]);
+        app.put(`${this.basePath}/:id`, [autenticacao, this.validateID,this.replace]);
+        app.delete(`${this.basePath}/:id`, [autenticacao, this.validateID,this.delete]);
     }
 };
 const PermissaoCadController = new PermissaoController();
