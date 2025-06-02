@@ -9,7 +9,7 @@ const geraToken = (id: ObjectId): string => {
     return jwt.sign({ id }, apiSecret as string, { expiresIn: '1h'});
 };
 
-const protegeEGeraNovaToken = async (req, res, next) => {
+const autenticacao = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -20,8 +20,8 @@ const protegeEGeraNovaToken = async (req, res, next) => {
         const token = authHeader.split(' ')[1];
 
         // Valida a decodificação do token
-        const decodificado = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
-
+        const decodificado = jwt.verify(token, enviroment.security.JWT_SECRET as string) as JwtPayload;
+        
         // Encontra o usuario com o Id decodificado
         req.user = await Usuario.findById(decodificado.id).select('-senha');
 
@@ -36,3 +36,4 @@ const protegeEGeraNovaToken = async (req, res, next) => {
         return res.status(401).json({ message: 'Token inválido'});
     }
 };
+export { autenticacao };

@@ -3,17 +3,18 @@ import { ModelRouter } from "../common/model-router";
 import * as express from 'express' 
 import { IUsuario, Usuario } from "../models/usuario.model";
 import jwt from 'jsonwebtoken';
-
+import { enviroment } from "../common/environment";
+import { autenticacao } from "../middleware/authmiddleware";
 class UsuarioController extends ModelRouter<IUsuario> {
     constructor() {
         super(Usuario)
     }
 
-    login = async (req: express.Request, res: express.Response) => {
+    login = async (req, res) => {
         const { email, senha } = req.body;
 
-        const generateToken = (id: string): string => {
-            return jwt.sign({ id }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
+        const generateToken = (id: string): string => {            
+            return jwt.sign({ id }, enviroment.security.JWT_SECRET as string, { expiresIn: '1h' });
         };
 
         try {
@@ -34,12 +35,13 @@ class UsuarioController extends ModelRouter<IUsuario> {
     }
 
     applyrouter(app: express.Application) {
-        app.get(`${this.basePath}`, this.find);
-        app.get(`${this.basePath}/:id`, [this.validateID,this.findById]);
-        app.post(`${this.basePath}`, this.save);
-        app.patch(`${this.basePath}/:id`, [this.validateID,this.update]);
-        app.put(`${this.basePath}/:id`, [this.validateID,this.replace]);
-        app.delete(`${this.basePath}/:id`, [this.validateID,this.delete]);
+        app.get(`${this.basePath}`, [autenticacao, this.find]);
+        app.get(`${this.basePath}/:id`, [autenticacao,this.validateID,this.findById]);
+        app.post(`${this.basePath}`, [autenticacao, this.save]);
+        app.post(`${this.basePath}/login`, this.login);
+        app.patch(`${this.basePath}/:id`, [autenticacao,this.validateID,this.update]);
+        app.put(`${this.basePath}/:id`, [autenticacao, this.validateID,this.replace]);
+        app.delete(`${this.basePath}/:id`, [autenticacao, this.validateID,this.delete]);
     }
 };
 
