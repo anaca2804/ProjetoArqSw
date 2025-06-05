@@ -2,6 +2,7 @@ import { ModelRouter } from "../common/model-router";
 import * as express from 'express'
 import { IMovimentacoesEstoque, MovimentacoesEstoque } from "../models/movimentacoes-estoque.model";
 import { autenticacao } from "../middleware/authmiddleware";
+import { registraLog } from "../middleware/logMiddleware";
 
 class MovimentacaoController extends ModelRouter<IMovimentacoesEstoque> {
     constructor () {
@@ -10,11 +11,11 @@ class MovimentacaoController extends ModelRouter<IMovimentacoesEstoque> {
 
     applyrouter(app: express.Application) {
         app.get(`${this.basePath}`, [autenticacao, this.find]);
-        app.get(`${this.basePath}/:id`, [autenticacao, this.validateID, this.findById]);
-        app.post(`${this.basePath}`, [autenticacao, this.save]);
-        app.patch(`${this.basePath}/:id`, [autenticacao, this.validateID, this.update]);
-        app.put(`${this.basePath}/:id`, [autenticacao, this.validateID, this.replace]);
-        app.delete(`${this.basePath}/:id`, [autenticacao, this.validateID,this.delete]);
+        app.get(`${this.basePath}/:id`, [autenticacao,this.validateID,this.findById]);
+        app.post(`${this.basePath}`, [autenticacao, this.save, registraLog(this.basePath, "cadastro")]);
+        app.patch(`${this.basePath}/:id`, [autenticacao,this.validateID,this.update, registraLog(this.basePath, "edicao")]);
+        app.put(`${this.basePath}/:id`, [autenticacao, this.validateID,this.replace, registraLog(this.basePath, "edicao")]);
+        app.delete(`${this.basePath}/:id`, [autenticacao, this.validateID,this.delete, registraLog(this.basePath, "exclusão")]);
     }
 };
 

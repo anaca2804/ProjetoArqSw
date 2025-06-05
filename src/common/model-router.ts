@@ -57,7 +57,6 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
   }
 
   validateID = (req, resp, next) => {
-    console.log(req.params.id);
     
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       next({ message: "Documents não encontrado" });
@@ -197,7 +196,6 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
   };
 
   delete = (req, resp, next) => {
-    console.log(req.params.id);
     
     this.model
       .deleteOne({ _id: req.params.id })
@@ -205,10 +203,10 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
       .then((cmdResult: any) => {
         if (cmdResult.deletedCount > 0) {
           resp.sendStatus(204);
+          return next();
         } else {
           resp.status(404).send("Documento não encontrado");
         }
-        return next();
       })
       .catch(next);
   };;

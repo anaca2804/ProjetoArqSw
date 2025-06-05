@@ -3,7 +3,7 @@ import { IUsuario } from "./usuario.model";
 interface ILog extends mongoose.Document{
     id_usuario: IUsuario;
     tipo: string;
-    descricao: string
+    payload
 };
 
 const LogSchema = new mongoose.Schema({
@@ -16,6 +16,12 @@ const LogSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: ['cadastro', 'exclusão', 'edicao']
+    },
+    collection_afetada: {
+        type: JSON,
+    },
+    payload: {
+        type: JSON,
     }
 })
 

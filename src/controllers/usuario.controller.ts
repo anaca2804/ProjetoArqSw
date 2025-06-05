@@ -5,6 +5,7 @@ import { IUsuario, Usuario } from "../models/usuario.model";
 import jwt from 'jsonwebtoken';
 import { enviroment } from "../common/environment";
 import { autenticacao } from "../middleware/authmiddleware";
+import { registraLog } from "../middleware/logMiddleware";
 class UsuarioController extends ModelRouter<IUsuario> {
     constructor() {
         super(Usuario)
@@ -37,16 +38,16 @@ class UsuarioController extends ModelRouter<IUsuario> {
     applyrouter(app: express.Application) {
         app.get(`${this.basePath}`, [autenticacao, this.find]);
         app.get(`${this.basePath}/:id`, [autenticacao,this.validateID,this.findById]);
-        app.post(`${this.basePath}`, [autenticacao, this.save]);
+        app.post(`${this.basePath}`, [autenticacao, this.save, registraLog(this.basePath, "cadastro")]);
         app.post(`${this.basePath}/login`, this.login);
-        app.patch(`${this.basePath}/:id`, [autenticacao,this.validateID,this.update]);
-        app.put(`${this.basePath}/:id`, [autenticacao, this.validateID,this.replace]);
-        app.delete(`${this.basePath}/:id`, [autenticacao, this.validateID,this.delete]);
+        app.patch(`${this.basePath}/:id`, [autenticacao,this.validateID,this.update, registraLog(this.basePath, "edicao")]);
+        app.put(`${this.basePath}/:id`, [autenticacao, this.validateID,this.replace, registraLog(this.basePath, "edicao")]);
+        app.delete(`${this.basePath}/:id`, [autenticacao, this.validateID,this.delete, registraLog(this.basePath, "exclusão")]);
     }
 };
 
 const UsuariosController = new UsuarioController();
 
-console.log(UsuariosController.basePath);
+
 
 export { UsuariosController };
