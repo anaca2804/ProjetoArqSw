@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { enviroment } from "../common/environment";
 import { Usuario } from "../models/usuario.model";
 
-const apiSecret = enviroment.security.JWT_SECRET;
+const apiSecret = (enviroment.security.JWT_SECRET) as string;
 
 const geraToken = (id: ObjectId): string => {
     return jwt.sign({ id }, apiSecret as string, { expiresIn: '1h'});
@@ -20,7 +20,7 @@ const autenticacao = async (req, res, next) => {
         const token = authHeader.split(' ')[1];
 
         // Valida a decodificação do token
-        const decodificado = jwt.verify(token, enviroment.security.JWT_SECRET as string) as JwtPayload;
+        const decodificado = jwt.verify(token, apiSecret) as JwtPayload;
         
         // Encontra o usuario com o Id decodificado
         req.user = await Usuario.findById(decodificado.id).select('-senha');
