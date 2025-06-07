@@ -24,6 +24,10 @@ const MovimentacoesEstoqueSchema = new mongoose.Schema({
         type: String,
         required: true,
         enum: ['entrada', 'saida']
+    },
+    quantidade: {
+        type: Number,
+        required: true
     }
 }, {timestamps: true});
 
