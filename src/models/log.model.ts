@@ -7,9 +7,9 @@ interface ILog extends mongoose.Document{
 };
 
 const LogSchema = new mongoose.Schema({
-    id_usuario:{
+    id_usuario: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'Usuario',
+        ref: 'Usuario',
         required: true
     },
     tipo: {
@@ -23,7 +23,7 @@ const LogSchema = new mongoose.Schema({
     payload: {
         type: JSON,
     }
-})
+}, { timestamps: true });
 
 const Logs = mongoose.model<ILog>('Logs', LogSchema);
 
