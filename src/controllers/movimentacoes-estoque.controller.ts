@@ -3,7 +3,7 @@ import * as express from 'express'
 import { IMovimentacoesEstoque, MovimentacoesEstoque } from "../models/movimentacoes-estoque.model";
 import { autenticacao } from "../middleware/authmiddleware";
 import { registraLog } from "../middleware/logMiddleware";
-import { movimentaEstoque } from "../middleware/movimentaMiddleware";
+import { movimentaEstoque } from "../services/movimenta-estoque.service";
 
 class MovimentacaoController extends ModelRouter<IMovimentacoesEstoque> {
     constructor () {
