@@ -8,6 +8,7 @@ export const enviroment = {
         url: process.env.DB_URI_CONNECT || "localhost"
     },
     security:{
-        rounds: process.env.SECURITY_PASSWORD_ROUNDS || 10
+        rounds: process.env.SECURITY_PASSWORD_ROUNDS || 10,
+        JWT_SECRET: process.env.API_SECRET
     }
 }

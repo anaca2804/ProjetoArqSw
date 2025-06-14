@@ -5,6 +5,7 @@ interface IUsuario extends mongoose.Document{
     nome: string;
     email: string;
     senha: string;
+    matchSenha(senha: string): Promise<boolean>;
 };
 
 const UsuarioSchema = new mongoose.Schema({
@@ -14,7 +15,8 @@ const UsuarioSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     senha: {
         type: String,
@@ -42,6 +44,9 @@ const saveMiddleware = function (this: IUsuario, next) {
 }
 
 UsuarioSchema.pre("save", saveMiddleware);
+UsuarioSchema.methods.matchSenha = function (senhaInserida) {
+    return bcrypt.compare(senhaInserida, this.senha);
+};
 
 const Usuario = mongoose.model<IUsuario>('Usuario', UsuarioSchema);
 
