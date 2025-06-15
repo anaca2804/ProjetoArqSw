@@ -1,6 +1,7 @@
 import { stringify, parse } from "querystring";
 import { Router } from "./router";
 import * as mongoose from "mongoose";
+import { count } from "console";
 
 export abstract class ModelRouter<D extends mongoose.Document> extends Router {
   basePath: string;
@@ -22,7 +23,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
   }
 
   envelope(document: any): any {
-    const resource = Object.assign({ _links: {} }, document.toJSON());
+    let resource = Object.assign({ _links: {} }, document.toJSON());
     resource._links.self = `${this.basePath}/${resource._id}`;
     return resource;
   }
@@ -37,36 +38,26 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
       total_items: options.count,
       page: options.page ? options.page : 1,
     };
-
     if (options.page && options.count && options.pageSize) {
       const pathname = url.substring(0, url.indexOf("?"));
       const query = parse(url.substring(url.indexOf("?")));
-
       if (options.page > 1) {
         const previousQuery = Object.assign({}, query, {
           _page: options.page - 1,
         });
         resource._links.previous = `${pathname}?${stringify(previousQuery)}`;
       }
-
-      const remaining = options.count - options.page * options.pageSize;
-
+      const remaining = (options.count = -options.page * options.pageSize);
       if (remaining > 0) {
-        const nextQuery = Object.assign({}, query, {
-          _page: options.page + 1,
-        });
-        resource._links.next = `${pathname}?${stringify(nextQuery)}`;
+        const nextQuery = Object.assign({}, query, { _page: options.page + 1 });
+        resource.links.next = `${pathname}?${stringify(nextQuery)}`;
       }
     }
-
     return resource;
   }
 
-  validateID = (
-    req: mongoose.Request,
-    resp: mongoose.Response,
-    next: mongoose.NextFunction
-  ): void => {
+  validateID = (req, resp, next) => {
+    
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       next({ message: "Documents não encontrado" });
     } else {
@@ -74,13 +65,10 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     }
   };
 
-  findById = (
-    req: mongoose.Request,
-    res: mongoose.Response,
-    next: mongoose.NextFunction
-  ): void => {
+  findById = (req, res, next) => {
     const { id } = req.params;
 
+    //Verifica se o tipo do ID está correto
     if (typeof id !== "string" || !mongoose.isValidObjectId(id)) {
       return next(new Error("ID invalido"));
     } else {
@@ -90,20 +78,15 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     }
   };
 
-  findAll = (
-    req: mongoose.Request,
-    res: mongoose.Response,
-    next: mongoose.NextFunction
-  ): void => {
+  findAll = (req, res, next) => {
     let page = parseInt(req.query._page || 1);
     page = page > 0 ? page : 1;
-    const psize = parseInt(req.query._pageSize || this.pageSize);
+    let psize = parseInt(req.query._pageSize || this.pageSize);
     const skip = (page - 1) * psize;
-
     this.model
       .countDocuments()
       .exec()
-      .then(() =>
+      .then((count) =>
         this.model
           .find()
           .skip(skip)
@@ -113,7 +96,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
       .then(
         this.renderAll(res, next, {
           page,
-          count: undefined,
+          count,
           pageSize: psize,
           url: req.url,
         })
@@ -121,18 +104,16 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
       .catch(next);
   };
 
-  prepareWhere = (query: any): any => {
-    const traverse = (o: any): any => {
+  prepareWhere = (query) => {
+    const traverse = (o) => {
       if (Array.isArray(o)) traverseArray(o);
       if (typeof o === "object" && o !== null) traverseObject(o);
       return o;
     };
-
-    const traverseArray = (a: any[]): void => {
+    const traverseArray = (a) => {
       a.forEach((i) => traverse(i));
     };
-
-    const traverseObject = (o: any): void => {
+    const traverseObject = (o) => {
       Object.keys(o)
         .filter((k) => k !== "$options")
         .forEach((k) => {
@@ -144,15 +125,10 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
           } else traverse(o[k]);
         });
     };
-
     return traverse(query);
   };
 
-  find = (
-    req: mongoose.Request,
-    resp: mongoose.Response,
-    next: mongoose.NextFunction
-  ): void => {
+  find = (req, resp, next) => {
     const pageSize = parseInt(req.query._pageSize) || this.pageSize;
     let page = parseInt(req.query._page || 1);
     page = page > 0 ? page : 1;
@@ -194,20 +170,12 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     });
   };
 
-  save = (
-    req: mongoose.Request,
-    resp: mongoose.Response,
-    next: mongoose.NextFunction
-  ): void => {
-    const document = new this.model(req.body);
+  save = (req, resp, next) => {
+    let document = new this.model(req.body);
     document.save().then(this.render(resp, next)).catch(next);
   };
 
-  replace = (
-    req: mongoose.Request,
-    resp: mongoose.Response,
-    next: mongoose.NextFunction
-  ): void => {
+  replace = (req, resp, next) => {
     const options = {
       runValidators: true,
       overwrite: true,
@@ -219,28 +187,16 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
       .catch(next);
   };
 
-  update = (
-    req: mongoose.Request,
-    resp: mongoose.Response,
-    next: mongoose.NextFunction
-  ): void => {
-    const options = {
-      runValidators: true,
-      new: true,
-      useFindAndModify: true,
-      runHooks: true,
-    };
+  update = (req, resp, next) => {
+    const options = { runValidators: true, new: true, useFindAndModify: true, runHooks: true };
     this.model
       .findOneAndUpdate({ _id: req.params.id }, req.body, options)
       .then(this.render(resp, next))
       .catch(next);
   };
 
-  delete = (
-    req: mongoose.Request,
-    resp: mongoose.Response,
-    next: mongoose.NextFunction
-  ): void => {
+  delete = (req, resp, next) => {
+    
     this.model
       .deleteOne({ _id: req.params.id })
       .exec()
@@ -253,5 +209,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         }
       })
       .catch(next);
-  };
+  };;
+
+
 }
