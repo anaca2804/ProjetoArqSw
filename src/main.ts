@@ -1,6 +1,5 @@
 import { LogsController } from "./controllers/log.controller";
 import { MovimentacoesController } from "./controllers/movimentacoes-estoque.controller";
-import { PermissaoCadController } from "./controllers/permissao.controller";
 import { PermissoesMoveController } from "./controllers/permissoes.controller";
 import { ProdutosController } from "./controllers/produto.controller";
 import { UsuariosController } from "./controllers/usuario.controller";
@@ -14,7 +13,6 @@ aplicacao.iniciarServico([
     mainRouter,
     LogsController,
     MovimentacoesController,
-    PermissaoCadController,
     PermissoesMoveController,
     ProdutosController,
     UsuariosController

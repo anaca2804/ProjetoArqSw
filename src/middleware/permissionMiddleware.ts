@@ -1,36 +1,25 @@
-import { enviroment } from "../common/environment";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { ILog, Logs } from "../models/log.model";
+import { enviroment } from "../common/environment";
+import { IPermissoes, Permissoes } from "../models/permissoes.models";
 
 const apiSecret = (enviroment.security.JWT_SECRET) as string;
 
-const registraLog = (basePath: string, acao: ILog["tipo"]) => {
+const permissao = (basePath: string, permissao: string) => {
   return async (req, res, next) => {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ message: 'Não autorizado' });
     }
-    
+
     try {
       const token = authHeader.split(' ')[1]
-      
       const idUsuarioLogado = (jwt.verify(token, apiSecret) as JwtPayload).id;
-      const payload = req.body;
-
-      const collection_afetada = {
-        nome: basePath,
-        id_collection: req.params.id || null
-      };
-
-      const log = {
-        id_usuario: idUsuarioLogado,
-        tipo: acao,
-        payload: payload || null,
-        collection_afetada: collection_afetada
-      };
+      const permissions = await Permissoes.findOne({ id_usuario: idUsuarioLogado, id_collection: basePath.substring(1) })
       
-      await Logs.create(log)
+      if (!permissions?.permissao.includes(permissao)) {
+        return res.status(403).send({ message: "sem permissão" });
+      }
       
     } catch (err) {
       return res.status(400).send({ error: err });
@@ -40,4 +29,4 @@ const registraLog = (basePath: string, acao: ILog["tipo"]) => {
   };
 };
 
-export { registraLog };
+export { permissao }
