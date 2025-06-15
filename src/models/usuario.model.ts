@@ -43,7 +43,24 @@ const saveMiddleware = function (this: IUsuario, next) {
     }
 }
 
+const updateMiddleware = async function (this: mongoose.Query<any, any>, next) {
+    const update: any = this.getUpdate();
+    
+    if (update?.senha) {
+        try {
+            const hash = await bcrypt.hash(update.senha, Number(enviroment.security.rounds));
+            this.setUpdate({ ...update, senha: hash });
+        } catch (err: any) {
+            return next(err);
+        }
+    }
+    next();
+}
+
+UsuarioSchema.pre('findOneAndUpdate',updateMiddleware);
+UsuarioSchema.pre('findOneAndReplace',updateMiddleware);
 UsuarioSchema.pre("save", saveMiddleware);
+
 UsuarioSchema.methods.matchSenha = function (senhaInserida) {
     return bcrypt.compare(senhaInserida, this.senha);
 };
