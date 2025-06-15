@@ -1,22 +1,28 @@
 import mongoose from "mongoose";
 import { IUsuario } from "./usuario.model";
-import { IPermissao } from "./permissao.model";
 
 interface IPermissoes extends mongoose.Document{
     id_usuario: IUsuario;
-    id_permissao: IPermissao;
+    permissao: [string];
+    id_collection: string
 };
 
 const PermissoesSchema = new mongoose.Schema({
     id_usuario: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Usuario',
-        required: true
+        required: true,
+        unique: false
     },
-    id_permissao: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Permissao',
-        required: true
+    permissao: {
+        type: Array,
+        required: true,
+        enumm: ["cadastro","exclusão","edicao","leitura"]
+    },
+    id_collection: {
+        type: String,
+        required: true,
+        enum: ['logs','movimentacoes-estoques','permissoes','produtos']
     }
 }, {timestamps: true});
 
