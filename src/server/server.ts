@@ -3,6 +3,7 @@ import { enviroment } from "../common/environment";
 import mongoose from "mongoose";
 import { Router } from "../common/router";
 import { handleError } from "./error.handler";
+import { setupSwagger } from "../common/swagger";
 
 const port = enviroment.server.port;
 
@@ -11,6 +12,7 @@ export class Server {
 
     constructor() {
         this.app.use(express.json());
+        setupSwagger(this.app);
     }
 
     iniciarServidor = () => {

@@ -7,11 +7,69 @@ import { enviroment } from "../common/environment";
 import { autenticacao } from "../middleware/authmiddleware";
 import { registraLog } from "../middleware/logMiddleware";
 import { permissao } from "../middleware/permissionMiddleware";
+/**
+ * @swagger
+ * tags:
+ *   name: Usuários
+ *   description: Gerenciamento de usuários do sistema
+ *components:
+ *   schemas:
+ *     Usuario:
+ *       type: object
+ *       required:
+ *         - email
+ *         - senha
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: ID do usuário
+ *         nome:
+ *           type: string
+ *           description: Nome do usuário
+ *         email:
+ *           type: string
+ *           description: Email do usuário
+ *         senha:
+ *           type: string
+ *           description: Senha do usuário
+ */
 class UsuarioController extends ModelRouter<IUsuario> {
     constructor() {
         super(Usuario)
     }
-
+/**
+ * @swagger
+ * /usuarios/login:
+ *   post:
+ *     summary: Realiza login de usuário
+ *     tags: [Usuários]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - senha
+ *             properties:
+ *               email:
+ *                 type: string
+ *               senha:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Retorna o token JWT
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *       401:
+ *         description: Credenciais inválidas
+ */
     login = async (req, res) => {
         const { email, senha } = req.body;
 
@@ -35,7 +93,112 @@ class UsuarioController extends ModelRouter<IUsuario> {
             }
         }
     }
-
+    /**
+     * @swagger
+     * /usuarios:
+     *   get:
+     *     summary: Lista todos os usuários
+     *     tags: [Usuários]
+     *     responses:
+     *       200:
+     *         description: Lista de usuários
+     */
+    /**
+     * @swagger
+     * /usuarios/{id}:
+     *   get:
+     *     summary: Busca um usuário por ID
+     *     tags: [Usuários]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Usuário encontrado
+     *       404:
+     *         description: Usuário não encontrado
+     */
+    /**
+     * @swagger
+     * /usuarios:
+     *   post:
+     *     summary: Cria um novo usuário
+     *     tags: [Usuários]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Usuario'
+     *     responses:
+     *       201:
+     *         description: Usuário criado
+     */
+    /**
+     * @swagger
+     * /usuarios/{id}:
+     *   patch:
+     *     summary: Atualiza parcialmente um usuário
+     *     tags: [Usuários]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Usuario'
+     *     responses:
+     *       200:
+     *         description: Usuário atualizado
+     */
+    /**
+     * @swagger
+     * /usuarios/{id}:
+     *   put:
+     *     summary: Substitui um usuário
+     *     tags: [Usuários]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/Usuario'
+     *     responses:
+     *       200:
+     *         description: Usuário substituído
+     */
+    /**
+     * @swagger
+     * /usuarios/{id}:
+     *   delete:
+     *     summary: Exclui um usuário
+     *     tags: [Usuários]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       204:
+     *         description: Usuário excluído
+     *       404:
+     *         description: Usuário não encontrado
+     */
     applyrouter(app: express.Application) {
         app.get(`${this.basePath}`, [permissao(this.basePath, 'leitura'), autenticacao, this.find]);
         app.get(`${this.basePath}/:id`, [permissao(this.basePath, 'leitura'), autenticacao,this.validateID,this.findById]);
