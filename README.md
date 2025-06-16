@@ -8,13 +8,18 @@ O projeto utiliza **Node.js**, **Express** e **TypeScript**, seguindo o padrão 
 
 - **TypeScript**: Superset do JavaScript que adiciona tipagem estática.
 - **@types/express**: Tipagens TypeScript para o framework Express.
+- **@types/jsonwebtoken**: Tipagens TypeScript para uso da biblioteca jsonwebtoken com TypeScript.
 - **@types/node**: Tipagens TypeScript para os módulos nativos do Node.js.
-- **dotenv**: Gerenciamento de variáveis de ambiente.
+- **typescript**: Compilador TypeScript.
+- **dotenv**: Gerenciamento de variáveis de ambiente via arquivo `.env`.
 - **Express**: Framework minimalista para construção de APIs REST.
 - **mongodb**: Driver oficial do MongoDB para Node.js.
-- **Mongoose**: ODM para comunicação com bancos MongoDB.
-- **nodemon**: Monitoramento automático para ambiente de desenvolvimento.
-- **projetoarqsw**: Dependência local vinculada ao projeto, utilizada para organização ou funcionalidades específicas.
+- **Mongoose**: ODM (Object Data Modeling) para MongoDB, facilitando a modelagem de dados.
+- **nodemon**: Ferramenta que reinicia automaticamente a aplicação durante o desenvolvimento ao detectar mudanças.
+- **bcrypt**: Biblioteca para hashing de senhas e comparação segura.
+- **jsonwebtoken**: Geração e verificação de tokens JWT para autenticação.
+- **swagger-jsdoc**: Geração de documentação Swagger a partir de comentários JSDoc.
+- **swagger-ui-express**: Middleware para servir a interface visual do Swagger na aplicação Express.
 
 ## Estrutura de Pastas
 
@@ -26,8 +31,10 @@ ProjetoArqSw/
 ├── src/
 │   ├── common/             # Utilitários comuns (ex: rotas base, variáveis de ambiente)
 │   ├── controllers/        # Controladores das entidades (lógica das requisições)
+│   ├── middleware/         # Funções intermediárias executadas durante o ciclo de requisição/resposta (ex: autenticação, permissões)
 │   ├── models/             # Modelos de dados (estrutura das entidades)
 │   ├── server/             # Configurações e inicialização do servidor
+│   ├── services/           # Regras de negócio reutilizáveis e lógica de acesso a dados fora dos controladores
 │   ├── main.router.ts      # Arquivo principal de roteamento
 │   └── main.ts             # Ponto de entrada da aplicação
 │
@@ -71,27 +78,13 @@ npm run dev
 ```
 (O projeto será iniciado utilizando `nodemon` para recarregamento automático.)
 
-### Ambiente de Produção
-```bash
-npm run build
-npm start
-```
-
-## Testes
-
-Para rodar os testes automatizados:
-
-```bash
-npm test
-```
-
 ## Exemplos de Endpoints
 
 Abaixo alguns exemplos básicos de como interagir com a API usando `curl`:
 
-### Registrar um novo usuário
+### Registrar um novo usuário (rota protegida - requer token JWT)
 ```bash
-curl -X POST http://localhost:3000/api/users/register   -H "Content-Type: application/json"   -d '{"name": "João Silva", "email": "joao@email.com", "password": "senha123"}'
+curl -X POST http://localhost:3000/api/usuarios/   -H "Content-Type: application/json"   -d '{"name": "João Silva", "email": "joao@email.com", "password": "senha123"}'
 ```
 
 ### Fazer login
