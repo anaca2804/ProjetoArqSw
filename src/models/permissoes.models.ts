@@ -22,7 +22,7 @@ const PermissoesSchema = new mongoose.Schema({
     id_collection: {
         type: String,
         required: true,
-        enum: ['logs','movimentacoes-estoques','permissoes','produtos']
+        enum: ['logs','movimentacoes-estoques','permissoes','produtos',"usuarios"]
     }
 }, {timestamps: true});
 
