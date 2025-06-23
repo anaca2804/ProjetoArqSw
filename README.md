@@ -66,7 +66,9 @@ npm install
 
 ```env
 PORT=3000
-MONGO_URI=mongodb://localhost:27017/projetoarqsw
+DB_URI_CONNECT=mongodb://localhost:27017/projetoarqsw
+SALT_ROUNDS=10
+API_SECRET=seu-segredo-aqui
 ```
 
 ## Como Rodar o Projeto
@@ -82,6 +84,19 @@ npm run build
 npm run dev
 ```
 (O projeto será iniciado utilizando `nodemon` para recarregamento automático.)
+
+## Como Usar o Swagger
+
+O Swagger está disponível na rota `/api-docs`. Para utilizá-lo:
+
+1. Certifique-se de que o servidor está rodando.
+2. Acesse o endereço:
+```
+http://localhost:3000/api-docs
+```
+3. Utilize a interface para testar as rotas da API.
+
+> ⚡ Observação: Ao iniciar o servidor, todas as rotas disponíveis serão exibidas no terminal.
 
 ## Exemplos de Endpoints
 
