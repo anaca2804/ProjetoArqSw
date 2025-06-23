@@ -1,4 +1,3 @@
-
 # ProjetoArqSw
 
 ProjetoArqSw é uma API backend desenvolvida como parte da disciplina de **Arquitetura de Software** com a ideia de ser um sistema de gerenciamento de materiais.  
@@ -73,6 +72,12 @@ MONGO_URI=mongodb://localhost:27017/projetoarqsw
 ## Como Rodar o Projeto
 
 ### Ambiente de Desenvolvimento
+1. Compile o projeto:
+```bash
+npm run build
+```
+
+2. Inicie o servidor em modo de desenvolvimento:
 ```bash
 npm run dev
 ```
